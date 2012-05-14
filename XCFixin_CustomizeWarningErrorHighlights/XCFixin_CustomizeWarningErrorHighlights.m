@@ -32,36 +32,33 @@ static void overridenewMessageAttributesForFont(id self, SEL _cmd, DVTTextAnnota
 	if (  strcmp(className, "IDEBuildIssueStaticAnalyzerResultAnnotation") == 0 ){	// apply our own theme for Warning Messages	
 		newTheme = analyzerTheme;
 	}
-	
-	if (  strcmp(className, "IDEDiagnosticWarningAnnotation") == 0 ){	// apply our own theme for Warning Messages	
-		newTheme = warningTheme;
-	}
-
-	if (  strcmp(className, "IDEDiagnosticErrorAnnotation") == 0 ||
+	else if (  strcmp(className, "IDEDiagnosticErrorAnnotation") == 0 ||
 		strcmp(className, "IDEBuildIssueErrorAnnotation") == 0  ){		// apply our own theme for Error Messages	
 		newTheme = errorTheme;
+	}
+	else if (  strcmp(className, "IDEDiagnosticWarningAnnotation") ||
+		strcmp(className, "IDEBuildIssueWarningAnnotation") == 0){	// apply our own theme for Warning Messages	
+		newTheme = warningTheme;
 	}
 
     ((void (*)(id, SEL, DVTTextAnnotationTheme*, id))gOriginalnewMessageAttributesForFont)(self, _cmd , newTheme, arg2);
 }
-
-
 
 + (void)pluginDidLoad: (NSBundle *)plugin{
 	
     XCFixinPreflight();
 
 	//define gradient for warning text highlight
-	NSGradient * gWarning = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithDeviceRed:1 green:1 blue:0 alpha:0.5]
-												   endingColor: [NSColor colorWithDeviceRed:1 green:1 blue:0 alpha:0.5]];
-	
+    NSGradient *gWarning = [[NSGradient alloc] initWithColorsAndLocations: [NSColor colorWithDeviceHue: 0.125 saturation: 1.0 brightness: 1.0 alpha: 1.0], 0.0,
+																		[NSColor colorWithDeviceHue: 0.1667 saturation: 0.3 brightness: 1.0 alpha: 1.0], 0.5,
+																		[NSColor colorWithDeviceHue: 0.125 saturation: 1.0 brightness: 1.0 alpha: 1.0], 1.0, nil];
 	//define warning text highlight theme
 	warningTheme = 
-	[[DVTTextAnnotationTheme alloc] initWithHighlightColor: [NSColor colorWithDeviceRed:1 green:1 blue:0 alpha:0.2] 
-											borderTopColor: [NSColor clearColor]
-										 borderBottomColor: [NSColor clearColor]
+	[[DVTTextAnnotationTheme alloc] initWithHighlightColor: [NSColor colorWithDeviceHue: 0.1667 saturation: 1.0 brightness: 1.0 alpha: 0.15]
+											borderTopColor: [NSColor colorWithDeviceHue: 0.1667 saturation: 0.5 brightness: 1.0 alpha: 0.30]
+										 borderBottomColor: [NSColor colorWithDeviceHue: 0.1667 saturation: 0.5 brightness: 1.0 alpha: 0.30]
 										   overlayGradient: nil
-								  messageBubbleBorderColor: [NSColor colorWithDeviceRed:1 green:1 blue:0 alpha:0.3] 
+								  messageBubbleBorderColor: [NSColor colorWithDeviceHue: 0.1667 saturation: 1.0 brightness: 1.0 alpha: 0.30] 
 									 messageBubbleGradient: gWarning
 												caretColor: [NSColor yellowColor]  
 							   highlightedRangeBorderColor: [NSColor clearColor] 
@@ -69,16 +66,17 @@ static void overridenewMessageAttributesForFont(id self, SEL _cmd, DVTTextAnnota
 	[gWarning release];
 	
 	//define gradient for error text highlight
-	NSGradient * gError = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithDeviceRed:1 green:0 blue:0 alpha:0.5]
-												   endingColor: [NSColor colorWithDeviceRed:1 green:0 blue:0 alpha:0.5]];
+    NSGradient *gError = [[NSGradient alloc] initWithColorsAndLocations: [NSColor colorWithDeviceHue: 0.0 saturation: 1.0 brightness: 0.33 alpha: 1.0], 0.0,
+																		[NSColor colorWithDeviceHue: 0.0 saturation: 0.75 brightness: 0.75 alpha: 1.0], 0.5,
+																		[NSColor colorWithDeviceHue: 0.0 saturation: 1.0 brightness: 0.33 alpha: 1.0], 1.0, nil];
 	
 	//define error text highlight theme
 	errorTheme = 
-	[[DVTTextAnnotationTheme alloc] initWithHighlightColor: [NSColor colorWithDeviceRed:1 green:0 blue:0 alpha:0.2] 
-											borderTopColor: [NSColor clearColor]
-										 borderBottomColor: [NSColor clearColor]
+	[[DVTTextAnnotationTheme alloc] initWithHighlightColor: [NSColor colorWithDeviceHue: 0.0 saturation: 0.75 brightness: 1.0 alpha: 0.15] 
+											borderTopColor: [NSColor colorWithDeviceHue: 0.0 saturation: 0.75 brightness: 1.0 alpha: 0.30]
+										 borderBottomColor: [NSColor colorWithDeviceHue: 0.0 saturation: 0.75 brightness: 1.0 alpha: 0.30]
 										   overlayGradient: nil
-								  messageBubbleBorderColor: [NSColor colorWithDeviceRed:1 green:0 blue:0 alpha:0.3] 
+								  messageBubbleBorderColor: [NSColor colorWithDeviceHue: 0.0 saturation: 0.75 brightness: 1.0 alpha: 0.30] 
 									 messageBubbleGradient: gError
 												caretColor: [NSColor redColor]  
 							   highlightedRangeBorderColor: [NSColor clearColor] 
@@ -86,16 +84,17 @@ static void overridenewMessageAttributesForFont(id self, SEL _cmd, DVTTextAnnota
 	[gError release];
 
 	//define gradient for static Analyzer text highlight
-	NSGradient * gAnalyzer = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithDeviceRed:0.8 green:0.8 blue:1 alpha:0.5]
-														endingColor: [NSColor colorWithDeviceRed:0.8 green:0.8 blue:1 alpha:0.5]];
+    NSGradient *gAnalyzer = [[NSGradient alloc] initWithColorsAndLocations: [NSColor colorWithDeviceHue: 0.611 saturation: 1.00 brightness: 0.25 alpha: 1.0], 0.0,
+																		[NSColor colorWithDeviceHue: 0.611 saturation: 1.00 brightness: 0.75 alpha: 1.0], 0.5,
+																		[NSColor colorWithDeviceHue: 0.611 saturation: 1.00 brightness: 0.25 alpha: 1.0], 1.0, nil];
 	
 	//define static Analyzer text highlight theme
 	analyzerTheme = 
-	[[DVTTextAnnotationTheme alloc] initWithHighlightColor: [NSColor colorWithDeviceRed:0.8 green:0.8 blue:1 alpha:0.2] 
-											borderTopColor: [NSColor clearColor]
-										 borderBottomColor: [NSColor clearColor]
+	[[DVTTextAnnotationTheme alloc] initWithHighlightColor: [NSColor colorWithDeviceHue: 0.611 saturation: 1.00 brightness: 1.0 alpha: 0.25] 
+											borderTopColor: [NSColor colorWithDeviceHue: 0.611 saturation: 1.00 brightness: 1.0 alpha: 0.50]
+										 borderBottomColor: [NSColor colorWithDeviceHue: 0.611 saturation: 1.00 brightness: 1.0 alpha: 0.50]
 										   overlayGradient: nil
-								  messageBubbleBorderColor: [NSColor colorWithDeviceRed:0.8 green:0.8 blue:1 alpha:0.3] 
+								  messageBubbleBorderColor: [NSColor colorWithDeviceHue: 0.611 saturation: 1.00 brightness: 1.0 alpha: 0.50] 
 									 messageBubbleGradient: gAnalyzer
 												caretColor: [NSColor blueColor]  
 							   highlightedRangeBorderColor: [NSColor clearColor] 
